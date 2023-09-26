@@ -5,5 +5,7 @@
 int checkTheFile(int argc);
 char* outputFileName(char *inputFilename);
 void lexer(FILE *inputFile, FILE *outputFile);
-
-int lexerClassification(char *input);
+void isComment(FILE *inputFile, FILE *outputFile, char temp, char temp2);
+void isString(FILE *inputFile, FILE *outputFile, char temp);
+void isCharLiteral(FILE *inputFile, FILE *outputFile, char temp);
+void isnumber(FILE *inputFile, FILE *outputFile, char temp, char temp2);
