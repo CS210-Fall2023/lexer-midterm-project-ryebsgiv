@@ -85,7 +85,7 @@ void lexer(FILE *inputFile, FILE *outputFile)
         }
 
         //temp is space or newline
-        else if (temp==' ' || temp=='\n')
+        else if (temp==' ' || temp=='\n'||temp=='\t')
         {
             temp=fgetc(inputFile);
             continue;
@@ -238,7 +238,7 @@ void isnumber(FILE *inputFile, FILE *outputFile, char temp, char temp2){
     while(temp!=EOF||temp2!=EOF)
     {
         temp=fgetc(inputFile);
-        // fputc(temp, outputFile);
+        fputc(temp, outputFile);
         if (temp=='.')
         {
             fputc(temp, outputFile);
@@ -267,6 +267,15 @@ void isnumber(FILE *inputFile, FILE *outputFile, char temp, char temp2){
         }
     }
 }
+
+/**
+ * @brief Checks the input is an opperator and prints it
+ * 
+ * @param inputFile 
+ * @param outputFile 
+ * @param temp 
+ * @param temp2 
+ */
 void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
    if (temp=='<')
    {
@@ -289,8 +298,8 @@ void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
         {
             fputc(temp, outputFile);
             fputc(temp2, outputFile);
-            char *opperator=" (opperator)\n";
-            fputs (opperator, outputFile);
+            char *operator=" (operator)\n";
+            fputs (operator, outputFile);
             return;
         }
         else{
@@ -304,8 +313,8 @@ void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
         {
             fputc(temp, outputFile);
             fputc(temp2, outputFile);
-            char *opperator=" (opperator)\n";
-            fputs (opperator, outputFile);
+            char *operator=" (operator)\n";
+            fputs (operator, outputFile);
             return;
         }
         else{
@@ -319,23 +328,23 @@ void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
         {
             fputc(temp, outputFile);
             fputc(temp2, outputFile);
-            char *opperator=" (opperator)\n";
-            fputs (opperator, outputFile);
+            char *operator=" (operator)\n";
+            fputs (operator, outputFile);
             return;
         }
         else{
             ungetc(temp2, inputFile);
         }
    }
-    else if (temp=='*')
+   else if (temp=='*')
    {
         temp2=fgetc(inputFile);
         if (temp2=='*')
         {
             fputc(temp, outputFile);
             fputc(temp2, outputFile);
-            char *opperator=" (opperator)\n";
-            fputs (opperator, outputFile);
+            char *operator=" (operator)\n";
+            fputs (operator, outputFile);
             return;
         }
         else{
@@ -349,8 +358,8 @@ void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
         {
             fputc(temp, outputFile);
             fputc(temp2, outputFile);
-            char *opperator=" (opperator)\n";
-            fputs (opperator, outputFile);
+            char *operator=" (operator)\n";
+            fputs (operator, outputFile);
             return;
         }
         else{
@@ -364,8 +373,8 @@ void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
         {
             fputc(temp, outputFile);
             fputc(temp2, outputFile);
-            char *opperator=" (opperator)\n";
-            fputs (opperator, outputFile);
+            char *operator=" (operator)\n";
+            fputs (operator, outputFile);
             return;
         }
         else{
@@ -373,10 +382,11 @@ void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
         }
    }
     fputc(temp, outputFile);
-    char *opperator=" (opperator)\n";
-    fputs (opperator, outputFile);
+    char *operator=" (operator)\n";
+    fputs (operator, outputFile);
     return;
 }
+
 /**
  * @brief This function determines if the information is a keyword or a identifier by running the input through the list of all the keywords
  * 
