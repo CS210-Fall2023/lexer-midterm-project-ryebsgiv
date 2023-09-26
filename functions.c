@@ -39,7 +39,9 @@ void lexer(FILE *inputFile, FILE *outputFile)
                     fputc(temp2, outputFile);
                 }
                 fputc(temp, outputFile);
-                fputc(temp2, outputFile);
+                // fputc(temp2, outputFile);
+                temp=fgetc(inputFile);
+                fputc(temp, outputFile);
                 char *comment=" (comment)\n";
                 fputs (comment, outputFile);
             }
@@ -50,12 +52,14 @@ void lexer(FILE *inputFile, FILE *outputFile)
                 fputs (opperator, outputFile);
             }
         }
+        return;
     }
+
 }
 
 int lexerClassification(char *input)
 {
     int type=0;
     return type;
-    //if 
+    //if SW
 }
