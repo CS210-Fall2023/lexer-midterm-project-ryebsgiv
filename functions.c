@@ -57,46 +57,54 @@ void lexer(FILE *inputFile, FILE *outputFile)
         {
             isComment(inputFile, outputFile, temp, temp2);
         }
+
         //if string
         else if (temp=='"')
         {
             isString(inputFile, outputFile, temp);
         }
+
         //if character literal
         else if (temp=='\'')
         {
             isCharLiteral(inputFile,outputFile,temp);
         }
+
         //if numeric literal
         else if (temp >= '0' && temp <= '9')
         {
             isnumber(inputFile,outputFile,temp,temp2);
         }
+
         //if opperator
         else if (temp=='.' || temp=='<' || temp=='>' || temp=='(' || temp==')' 
-            || temp=='+' || temp=='-' || temp=='*' ||temp=='|' ||temp=='&'
-            ||temp==';'||temp==','||temp==':'||temp=='['||temp==']'||temp=='=')
-            {
-                isOpperator(inputFile, outputFile, temp, temp2);
-            }
-        //temp is space
-        else if (temp==' '){
+        || temp=='+' || temp=='-' || temp=='*' ||temp=='|' ||temp=='&'
+        ||temp==';'||temp==','||temp==':'||temp=='['||temp==']'||temp=='=')
+        {
+            isOpperator(inputFile, outputFile, temp, temp2);
+        }
+
+        //temp is space or newline
+        else if (temp==' ' || temp=='\n')
+        {
             temp=fgetc(inputFile);
             continue;
         }
-        else if ((temp >= 'a' && temp <= 'z') || (temp >= 'A' && temp <= 'Z'))
-            {
-                isKeywordOrIdentifier(inputFile, outputFile, temp, temp2, keyword); 
-            }
 
-        // if unknown
-        // else            
-        // {
-        //     fputc(temp,outputFile);
-        //     char *unknown=" (unknown)\n";
-        //     fputs (unknown, outputFile);
+        else if ((temp >= 'a' && temp <= 'z') || (temp >= 'A' && temp <= 'Z'))
+        {
+            isKeywordOrIdentifier(inputFile, outputFile, temp, temp2, keyword); 
+        }
+
+        //if unknown
+        else            
+        {
+            fputc(temp,outputFile);
+            char *unknown=" (unknown)\n";
+            fputs (unknown, outputFile);
             
-        // }
+        }
+        //increment the file by one
         temp=fgetc(inputFile);
     }
 
@@ -369,20 +377,41 @@ void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
     fputs (opperator, outputFile);
     return;
 }
+/**
+ * @brief This function determines if the information is a keyword or a identifier by running the input through the list of all the keywords
+ * 
+ * @param inputFile the input file
+ * @param outputFile the output file
+ * @param temp temp value used for moving through the file
+ * @param temp2 secondary temp value used for moving through the file
+ * @param keyword array of all the possible key words
+ */
 void isKeywordOrIdentifier(FILE *inputFile, FILE *outputFile, char temp, char temp2, char *keyword[]){
+    //total number of possible keywords
     int numPossible=37;
+    //total possible length of input
     char tokenHolder[256];
+    //counter
     int numberToken=0;
 
-    while ((temp != ' ' && temp != EOF && temp!= '\n' )&&(((temp >= 'a' && temp <= 'z') || (temp >= 'A' && temp <= 'Z')||(temp >= 'A' && temp <= 'Z')||(temp =='_'))))
+    //Loop that stores temp to array as long as it fits within the requirements
+    while ((temp != ' ' && temp != EOF && temp!= '\n' )&&(((temp >= 'a' && temp <= 'z') || (temp >= 'A' && temp <= 'Z')||(temp >= '0' && temp <= '9')||(temp =='_'))))
     {
         tokenHolder[numberToken]=temp;
         numberToken++;
         temp=fgetc(inputFile);
     }
-        
+    //check to make sure the loop didn't take one too many values
+    if (temp!=((temp >= 'a' && temp <= 'z') || (temp >= 'A' && temp <= 'Z')||(temp >= '0' && temp <= '9')||(temp =='_')))
+    {
+        ungetc(temp, inputFile);
+    }
+    
+    //Put a null terminator at the end of the string. This is essential for comparing the strings and the keywords
     tokenHolder[numberToken]='\0';
     
+    //compare the string to all of the keywords if it matches then print the word with the keyword label
+    //else it is an identifier
     for (int i=0; i<numPossible; i++){
         if (strcmp(tokenHolder, keyword[i])==0){
             fputs (tokenHolder, outputFile);
