@@ -76,21 +76,21 @@ void lexer(FILE *inputFile, FILE *outputFile)
             isnumber(inputFile,outputFile,temp,temp2);
         }
 
-        //if opperator
+        //if operator
         else if (temp=='.' || temp=='<' || temp=='>' || temp=='(' || temp==')' 
         || temp=='+' || temp=='-' || temp=='*' ||temp=='|' ||temp=='&'
-        ||temp==';'||temp==','||temp==':'||temp=='['||temp==']'||temp=='=')
+        ||temp==';'||temp==','||temp==':'||temp=='['||temp==']'||temp=='=' || temp=='.'||temp=='<'||temp=='>'||temp=='!')
         {
-            isOpperator(inputFile, outputFile, temp, temp2);
+            isOperator(inputFile, outputFile, temp, temp2);
         }
 
-        //temp is space or newline
+        //temp is space or newline or tab
         else if (temp==' ' || temp=='\n'||temp=='\t')
         {
             temp=fgetc(inputFile);
             continue;
         }
-
+        //temp is an identifier or a keyword
         else if ((temp >= 'a' && temp <= 'z') || (temp >= 'A' && temp <= 'Z'))
         {
             isKeywordOrIdentifier(inputFile, outputFile, temp, temp2, keyword); 
@@ -121,7 +121,7 @@ void isComment(FILE *inputFile, FILE *outputFile, char temp, char temp2)
 {
     //set temp2 equal to the second value in the file
     temp2=fgetc(inputFile);
-    //if it's equal to * then it is a comment and not an opperator
+    //if it's equal to * then it is a comment and not an operator
     if (temp2=='*')
     {
 
@@ -142,12 +142,12 @@ void isComment(FILE *inputFile, FILE *outputFile, char temp, char temp2)
             }
         }
     }
-    //if it is not a comment but an opperator
+    //if it is not a comment but an operator
     else
     {
         fputc(temp, outputFile);
-        char *opperator=" (opperator)\n";
-        fputs (opperator, outputFile);
+        char *operator=" (operator)\n";
+        fputs (operator, outputFile);
         return;
     }
 }
@@ -160,12 +160,15 @@ void isComment(FILE *inputFile, FILE *outputFile, char temp, char temp2)
  */
 void isString(FILE *inputFile, FILE *outputFile, char temp)
 {
+    //put quotation mark into file and read next character
     fputc(temp, outputFile);
     temp=fgetc(inputFile);
+    //Loop through rest of the string
     while (temp!='"'){
         fputc(temp, outputFile);
         temp=fgetc(inputFile);
     }
+    //Put last quotation mark into file and then the string banner
     fputc(temp, outputFile);
     char *string=" (string)\n";
     fputs (string, outputFile);
@@ -205,78 +208,78 @@ void isCharLiteral(FILE *inputFile, FILE *outputFile, char temp)
 void isnumber(FILE *inputFile, FILE *outputFile, char temp, char temp2){
     fputc(temp, outputFile);
     temp2=fgetc(inputFile);
+
+    //If there is more numbers
     while (temp2<= '9' && temp2>= '0')
     {
         fputc(temp2, outputFile);
         temp2=fgetc(inputFile);
     }
-    char temp3=temp;
-    char isDecimal='n';
-    if (temp2!='.'&&temp2!='#'){
-        ungetc(temp2, inputFile);
-        char *numberLiteral=" (numeric literal)\n";
-        fputs (numberLiteral, outputFile);
-        return;
-    }
-    temp3=temp2;
-    if (temp2=='.'&&(temp2=fgetc(inputFile))=='.')
-    {
-        fputc(temp, outputFile);        
-        char *numberLiteral=" (numeric literal)\n";
-        fputs (numberLiteral, outputFile);
-        fputc(temp2, outputFile);
-        fputc(temp2, outputFile);
-        char *opperator=" (opperator)\n";
-        fputs (opperator, outputFile);
-        return;
-    }
-    else{
-        fputc(temp3, outputFile);
-        ungetc(temp2, inputFile);
-    }
 
-    while(temp!=EOF||temp2!=EOF)
+    //if there isnt a decimal or # then exit then print the number literal banner and return 
+    if (temp2!='.'&&temp2!='#')
     {
-        temp=fgetc(inputFile);
+        ungetc(temp2, inputFile);
+        char *numberLiteral=" (numeric literal)\n";
+        fputs (numberLiteral, outputFile);
+        return;
+    }
+    //If there is a period following the numbers, but it is an opperator not a decimal
+    if (temp2=='.'&&(temp=fgetc(inputFile))=='.')
+    {      
+        //print numberLiteral banner
+        char *numberLiteral=" (numeric literal)\n";
+        fputs (numberLiteral, outputFile);
+
+        //print two periods to file and then the opperator banner
         fputc(temp, outputFile);
-        if (temp=='.')
+        fputc(temp, outputFile);
+        char *operator=" (operator)\n";
+        fputs (operator, outputFile);
+        return;
+    }
+    //If decimal
+    else if (temp2=='.'&&(temp<= '9' && temp>= '0'))
+    {
+        //Put period into file
+        fputc(temp2, outputFile);
+        //cycle through remaining intergers behind the decimal
+        while (temp<= '9' && temp>= '0')
         {
             fputc(temp, outputFile);
-            if (isDecimal=='y')
-            {
-                ungetc(temp2, inputFile);
-                fputc(temp, outputFile);
-                char *numberLiteral=" (numeric literal)\n";
-                fputs (numberLiteral, outputFile);
-            }
-            isDecimal='y';
+            temp=fgetc(inputFile);
         }
-        // else if (temp=='#')
-        // {   
-        //     temp2=fgetc(inputFile);
-        //     if (temp2=='0'||temp2=='1'||temp2=='2'||temp2=='3'||temp2=='4'||temp2=='5'||temp2=='6'||temp2=='7'||temp2=='8'||temp2=='9')
-        //     {
-        //         ungetc(temp2, inputFile);
-        //         // fputc(temp, outputFile);
-        //     }
-
-        // }
-        else{
-            ungetc(temp, inputFile);
-            break;
+        ungetc(temp, inputFile);
+        char *numberLiteral=" (numeric literal)\n";
+        fputs (numberLiteral, outputFile);
+        return;
+    }
+    //else the number is followed by #
+    else{
+        fputc(temp2, outputFile);
+        temp=fgetc(inputFile);
+        while ((temp<= '9' && temp>= '0')||temp=='#')
+        {
+            fputc(temp, outputFile);
+            temp=fgetc(inputFile);
         }
+        ungetc(temp, inputFile);
+        char *numberLiteral=" (numeric literal)\n";
+        fputs (numberLiteral, outputFile);
+        return;
     }
 }
 
 /**
- * @brief Checks the input is an opperator and prints it
+ * @brief Checks the input is an operator and prints it
  * 
  * @param inputFile 
  * @param outputFile 
  * @param temp 
  * @param temp2 
  */
-void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
+void isOperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
+    //Check if it one of the operators that has two parts
    if (temp=='<')
    {
         temp2=fgetc(inputFile);
@@ -284,8 +287,9 @@ void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
         {
             fputc(temp, outputFile);
             fputc(temp2, outputFile);
-            char *opperator=" (opperator)\n";
-            fputs (opperator, outputFile);
+            char *operator=" (operator)\n";
+            fputs (operator, outputFile);
+            return;
         }
         else{
             ungetc(temp2, inputFile);
@@ -381,6 +385,7 @@ void isOpperator(FILE *inputFile, FILE *outputFile, char temp, char temp2){
             ungetc(temp2, inputFile);
         }
    }
+   //otherwise just print the opperator and the banner
     fputc(temp, outputFile);
     char *operator=" (operator)\n";
     fputs (operator, outputFile);
